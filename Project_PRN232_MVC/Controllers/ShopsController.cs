@@ -10,6 +10,7 @@ using Repositories.Interface;
 using Services.Interface;
 using Services.Implement;
 using BusinessObjects.ModelsDTO.Shop;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project_PRN232_MVC.Controllers
 {
@@ -19,11 +20,14 @@ namespace Project_PRN232_MVC.Controllers
     {
         private readonly Prn222BeverageWebsiteProjectContext _context;
         private readonly ShopService _shopService;
+        private readonly ConfigDataService _configDataService;
+
 
         public ShopsController(Prn222BeverageWebsiteProjectContext context)
         {
             _context = context;
             _shopService = new ShopService();
+            _configDataService = new ConfigDataService();
         }
 
         // GET: api/Shops
@@ -77,6 +81,27 @@ namespace Project_PRN232_MVC.Controllers
             return Ok(response);
         }
 
+        // POST: api/Shops
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "UserOnly")]
+        [HttpPost]
+        public async Task<ActionResult<Shop>> PostShop(CreateShopRequest createShopRequest)
+        {
+            Shop shop = new Shop();
+
+            shop.ShopName = createShopRequest.ShopName;
+            shop.ShopAddress = createShopRequest.ShopAddress;
+            shop.ShopImage = createShopRequest.ShopImage;
+            shop.ShopDescription = createShopRequest.ShopDescription;
+            shop.StatusShopId = _configDataService.GetStatusShopIdByStatusShopName("pending");
+            shop.CreatedBy = createShopRequest.CreatedBy;
+            shop.CreatedAt = DateTime.Now;
+
+            Shop createdShop = _shopService.CreateShop(shop);
+
+            return CreatedAtAction("GetShop", new { id = createdShop.ShopId }, createdShop);
+        }
+
         // GET: api/Shops/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Shop>> GetShop(int id)
@@ -122,16 +147,7 @@ namespace Project_PRN232_MVC.Controllers
             return NoContent();
         }
 
-        // POST: api/Shops
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Shop>> PostShop(Shop shop)
-        {
-            _context.Shops.Add(shop);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetShop", new { id = shop.ShopId }, shop);
-        }
+        
 
         // DELETE: api/Shops/5
         [HttpDelete("{id}")]

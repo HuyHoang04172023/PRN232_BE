@@ -34,5 +34,12 @@ namespace DataAccessObjects
                 .Where(s => s.StatusShop != null && s.StatusShop.StatusShopName == statusName)
                 .ToList();
         }
+
+        public Shop CreateShop(Shop shop)
+        {
+            _context.Shops.Add(shop);
+            _context.SaveChanges();
+            return shop;
+        }
     }
 }

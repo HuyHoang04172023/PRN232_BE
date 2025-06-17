@@ -11,5 +11,6 @@ namespace Services.Interface
     {
         List<Shop> GetShops();
         List<Shop> GetShopsByStatusName(string statusName);
+        Shop CreateShop(Shop shop);
     }
 }

@@ -17,6 +17,7 @@ namespace Repositories.Implement
         {
             _shopDao = new ShopDAO();
         }
+
         public List<Shop> GetShops()
         {
             return _shopDao.GetShops();
@@ -25,6 +26,10 @@ namespace Repositories.Implement
         public List<Shop> GetShopsByStatusName(string statusName)
         {
             return _shopDao.GetShopsByStatusName(statusName);
+        }
+        public Shop CreateShop(Shop shop)
+        {
+            return _shopDao.CreateShop(shop);
         }
     }
 }

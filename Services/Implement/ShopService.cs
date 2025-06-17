@@ -19,6 +19,7 @@ namespace Services.Implement
         {
             _shopRepository = new ShopRepository();
         }
+
         public List<Shop> GetShops()
         {
             return _shopRepository.GetShops();
@@ -27,6 +28,11 @@ namespace Services.Implement
         public List<Shop> GetShopsByStatusName(string statusName)
         {
             return _shopRepository.GetShopsByStatusName(statusName);
+        }
+
+        public Shop CreateShop(Shop shop)
+        {
+            return _shopRepository.CreateShop(shop);
         }
     }
 }
