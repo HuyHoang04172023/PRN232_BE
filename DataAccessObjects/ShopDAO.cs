@@ -24,5 +24,15 @@ namespace DataAccessObjects
                 .Include(s => s.ApprovedByNavigation)
                 .ToList();
         }
+
+        public List<Shop> GetShopsByStatusName(string statusName) 
+        { 
+            return _context.Shops
+                .Include(s => s.StatusShop)
+                .Include(s => s.CreatedByNavigation)
+                .Include(s => s.ApprovedByNavigation)
+                .Where(s => s.StatusShop != null && s.StatusShop.StatusShopName == statusName)
+                .ToList();
+        }
     }
 }

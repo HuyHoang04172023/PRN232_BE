@@ -10,5 +10,6 @@ namespace Services.Interface
     public interface IShopService
     {
         List<Shop> GetShops();
+        List<Shop> GetShopsByStatusName(string statusName);
     }
 }

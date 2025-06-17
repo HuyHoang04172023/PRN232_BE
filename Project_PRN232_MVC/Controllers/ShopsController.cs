@@ -49,6 +49,34 @@ namespace Project_PRN232_MVC.Controllers
             return Ok(response);
         }
 
+        // GET: api/shops/status/{statusId}
+        [HttpGet("status/{statusName}")]
+        public async Task<ActionResult<IEnumerable<ShopResponse>>> GetShopsByStatus(string statusName)
+        {
+            List<Shop> shops = _shopService.GetShopsByStatusName(statusName);
+
+            if (shops == null || !shops.Any())
+            {
+                return NotFound(new { message = "Không tìm thấy cửa hàng với trạng thái này." });
+            }
+
+            var response = shops.Select(s => new ShopResponse
+            {
+                ShopId = s.ShopId,
+                ShopName = s.ShopName,
+                ShopAddress = s.ShopAddress,
+                ShopImage = s.ShopImage,
+                ShopDescription = s.ShopDescription,
+                StatusShopId = s.StatusShopId,
+                CreatedBy = s.CreatedBy,
+                CreatedAt = s.CreatedAt,
+                ApprovedBy = s.ApprovedBy,
+                StatusShop = s.StatusShop != null ? s.StatusShop.StatusShopName : null
+            }).ToList();
+
+            return Ok(response);
+        }
+
         // GET: api/Shops/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Shop>> GetShop(int id)

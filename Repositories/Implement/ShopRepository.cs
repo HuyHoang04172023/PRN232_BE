@@ -21,5 +21,10 @@ namespace Repositories.Implement
         {
             return _shopDao.GetShops();
         }
+
+        public List<Shop> GetShopsByStatusName(string statusName)
+        {
+            return _shopDao.GetShopsByStatusName(statusName);
+        }
     }
 }

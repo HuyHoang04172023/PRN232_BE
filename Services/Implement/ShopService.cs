@@ -23,5 +23,10 @@ namespace Services.Implement
         {
             return _shopRepository.GetShops();
         }
+
+        public List<Shop> GetShopsByStatusName(string statusName)
+        {
+            return _shopRepository.GetShopsByStatusName(statusName);
+        }
     }
 }

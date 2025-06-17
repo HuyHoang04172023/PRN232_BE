@@ -10,5 +10,6 @@ namespace Repositories.Interface
     public interface IShopRepository
     {
         List<Shop> GetShops();
+        List<Shop> GetShopsByStatusName(string statusName);
     }
 }
