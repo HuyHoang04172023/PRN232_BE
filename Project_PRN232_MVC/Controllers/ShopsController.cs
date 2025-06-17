@@ -104,16 +104,30 @@ namespace Project_PRN232_MVC.Controllers
 
         // GET: api/Shops/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Shop>> GetShop(int id)
+        public async Task<ActionResult<ShopResponse>> GetShop(int id)
         {
-            var shop = await _context.Shops.FindAsync(id);
+            Shop? shop = _shopService.GetShopById(id);
 
             if (shop == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Không tìm thấy cửa hàng với ID này." });
             }
 
-            return shop;
+            var response = new ShopResponse
+            {
+                ShopId = shop.ShopId,
+                ShopName = shop.ShopName,
+                ShopAddress = shop.ShopAddress,
+                ShopImage = shop.ShopImage,
+                ShopDescription = shop.ShopDescription,
+                StatusShopId = shop.StatusShopId,
+                CreatedBy = shop.CreatedBy,
+                CreatedAt = shop.CreatedAt,
+                ApprovedBy = shop.ApprovedBy,
+                StatusShop = shop.StatusShop != null ? shop.StatusShop.StatusShopName : null
+            };
+
+            return Ok(response);
         }
 
         // PUT: api/Shops/5

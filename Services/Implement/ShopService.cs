@@ -34,5 +34,10 @@ namespace Services.Implement
         {
             return _shopRepository.CreateShop(shop);
         }
+
+        public Shop? GetShopById(int id)
+        {
+            return _shopRepository.GetShopById(id);
+        }
     }
 }

@@ -41,5 +41,12 @@ namespace DataAccessObjects
             _context.SaveChanges();
             return shop;
         }
+
+        public Shop? GetShopById(int id)
+        {
+            return _context.Shops
+                .Include(s => s.StatusShop)
+                .FirstOrDefault(s => s.ShopId == id);
+        }
     }
 }

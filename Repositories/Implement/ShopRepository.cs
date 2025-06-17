@@ -31,5 +31,10 @@ namespace Repositories.Implement
         {
             return _shopDao.CreateShop(shop);
         }
+
+        public Shop? GetShopById(int id)
+        {
+            return _shopDao.GetShopById(id);
+        }
     }
 }

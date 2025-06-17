@@ -17,6 +17,5 @@ namespace BusinessObjects.ModelsDTO.Shop
         public string? ShopDescription { get; set; }
 
         public int? CreatedBy { get; set; }
-
     }
 }

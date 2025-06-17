@@ -12,5 +12,6 @@ namespace Repositories.Interface
         List<Shop> GetShops();
         List<Shop> GetShopsByStatusName(string statusName);
         Shop CreateShop(Shop shop);
+        Shop? GetShopById(int id);
     }
 }
