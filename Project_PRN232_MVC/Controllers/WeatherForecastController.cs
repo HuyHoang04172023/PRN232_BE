@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Project_PRN232_MVC.Controllers
@@ -18,6 +19,7 @@ namespace Project_PRN232_MVC.Controllers
             _logger = logger;
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
