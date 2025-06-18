@@ -35,9 +35,24 @@ namespace Services.Implement
             return _shopRepository.CreateShop(shop);
         }
 
-        public Shop? GetShopById(int id)
+        public Shop? GetShopByUserId(int id)
         {
-            return _shopRepository.GetShopById(id);
+            return _shopRepository.GetShopByUserId(id);
+        }
+
+        public Shop? GetShopByShopId(int shopId)
+        {
+            return _shopRepository.GetShopByShopId(shopId);
+        }
+
+        public bool UpdateShop(int shopId, Shop shopUpdate)
+        {
+            return _shopRepository.UpdateShop(shopId, shopUpdate);
+        }
+
+        public bool DeleteShop(int shopId)
+        {
+            return _shopRepository.DeleteShop(shopId);
         }
     }
 }

@@ -12,6 +12,9 @@ namespace Repositories.Interface
         List<Shop> GetShops();
         List<Shop> GetShopsByStatusName(string statusName);
         Shop CreateShop(Shop shop);
-        Shop? GetShopById(int id);
+        Shop? GetShopByUserId(int id);
+        Shop? GetShopByShopId(int shopId);
+        bool UpdateShop(int shopId, Shop shopUpdate);
+        bool DeleteShop(int shopId);
     }
 }

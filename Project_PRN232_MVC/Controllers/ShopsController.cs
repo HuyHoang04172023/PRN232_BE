@@ -99,18 +99,18 @@ namespace Project_PRN232_MVC.Controllers
 
             Shop createdShop = _shopService.CreateShop(shop);
 
-            return CreatedAtAction("GetShop", new { id = createdShop.ShopId }, createdShop);
+            return CreatedAtAction(nameof(GetShopByUserId), new { userId = createdShop.CreatedBy }, createdShop);
         }
 
         // GET: api/Shops/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ShopResponse>> GetShop(int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<ShopResponse>> GetShopByUserId(int userId)
         {
-            Shop? shop = _shopService.GetShopById(id);
+            Shop? shop = _shopService.GetShopByUserId(userId);
 
             if (shop == null)
             {
-                return NotFound(new { message = "Không tìm thấy cửa hàng với ID này." });
+                return NotFound(new { message = "Không tìm thấy cửa hàng với user ID này." });
             }
 
             var response = new ShopResponse
@@ -132,56 +132,53 @@ namespace Project_PRN232_MVC.Controllers
 
         // PUT: api/Shops/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutShop(int id, Shop shop)
+        [HttpPut("{shopId}")]
+        public async Task<IActionResult> PutShop(int shopId, UpdateShopRequest shopRequest)
         {
-            if (id != shop.ShopId)
+            Shop? existingShop = _shopService.GetShopByShopId(shopId);
+
+            if (existingShop == null)
             {
-                return BadRequest();
+                return NotFound(new { message = "Không tìm thấy cửa hàng." });
             }
 
-            _context.Entry(shop).State = EntityState.Modified;
+            existingShop.ShopName = shopRequest.ShopName;
+            existingShop.ShopAddress = shopRequest.ShopAddress;
+            existingShop.ShopImage = shopRequest.ShopImage;
+            existingShop.ShopDescription = shopRequest.ShopDescription;
+            existingShop.StatusShopId = _configDataService.GetStatusShopIdByStatusShopName("pending");
 
+            _shopService.UpdateShop(shopId, existingShop);
             try
             {
                 await _context.SaveChangesAsync();
+                return Ok(existingShop);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ShopExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(500, new { message = "Lỗi cập nhật dữ liệu. Vui lòng thử lại." });
             }
-
-            return NoContent();
         }
-
-        
 
         // DELETE: api/Shops/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteShop(int id)
+        [HttpDelete("{shopId}")]
+        public IActionResult DeleteShop(int shopId)
         {
-            var shop = await _context.Shops.FindAsync(id);
-            if (shop == null)
+            var existingShop = _shopService.GetShopByShopId(shopId);
+
+            if (existingShop == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Không tìm thấy cửa hàng." });
             }
 
-            _context.Shops.Remove(shop);
-            await _context.SaveChangesAsync();
+            bool isDeleted = _shopService.DeleteShop(shopId);
+
+            if (!isDeleted)
+            {
+                return StatusCode(500, new { message = "Xóa cửa hàng thất bại. Vui lòng thử lại sau." });
+            }
 
             return NoContent();
-        }
-
-        private bool ShopExists(int id)
-        {
-            return _context.Shops.Any(e => e.ShopId == id);
         }
     }
 }

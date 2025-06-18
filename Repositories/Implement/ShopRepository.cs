@@ -32,9 +32,24 @@ namespace Repositories.Implement
             return _shopDao.CreateShop(shop);
         }
 
-        public Shop? GetShopById(int id)
+        public Shop? GetShopByUserId(int id)
         {
-            return _shopDao.GetShopById(id);
+            return _shopDao.GetShopByUserId(id);
+        }
+
+        public Shop? GetShopByShopId(int shopId)
+        {
+            return _shopDao.GetShopByShopId(shopId);
+        }
+
+        public bool UpdateShop(int shopId, Shop shopUpdate)
+        {
+            return _shopDao.UpdateShop(shopId, shopUpdate);
+        }
+
+        public bool DeleteShop(int shopId)
+        {
+            return _shopDao.DeleteShop(shopId);
         }
     }
 }
