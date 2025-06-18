@@ -100,5 +100,27 @@ namespace DataAccessObjects
                 return false;
             }
         }
+        public bool UpdateStatusShopIdByShopId(int shopId, int statusShopId)
+        {
+            var shop = _context.Shops.FirstOrDefault(s => s.ShopId == shopId);
+
+            if (shop == null)
+            {
+                return false;
+            }
+
+            shop.StatusShopId = statusShopId;
+
+            try
+            {
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
     }
 }

@@ -51,5 +51,10 @@ namespace Repositories.Implement
         {
             return _shopDao.DeleteShop(shopId);
         }
+
+        public bool UpdateStatusShopIdByShopId(int shopId, int statusShopId)
+        {
+            return _shopDao.UpdateStatusShopIdByShopId(shopId, statusShopId);
+        }
     }
 }

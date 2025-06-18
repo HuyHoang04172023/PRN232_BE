@@ -16,5 +16,6 @@ namespace Repositories.Interface
         Shop? GetShopByShopId(int shopId);
         bool UpdateShop(int shopId, Shop shopUpdate);
         bool DeleteShop(int shopId);
+        bool UpdateStatusShopIdByShopId(int shopId, int statusShopId);
     }
 }

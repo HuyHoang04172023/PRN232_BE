@@ -54,5 +54,10 @@ namespace Services.Implement
         {
             return _shopRepository.DeleteShop(shopId);
         }
+
+        public bool UpdateStatusShopIdByShopId(int shopId, int statusShopId)
+        {
+            return _shopRepository.UpdateStatusShopIdByShopId(shopId, statusShopId);
+        }
     }
 }

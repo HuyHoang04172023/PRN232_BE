@@ -183,5 +183,35 @@ namespace Project_PRN232_MVC.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("update-status/{shopId}")]
+        public IActionResult UpdateShopStatus(int shopId, [FromQuery] string statusName)
+        {
+            bool result = false;
+
+            if (statusName == "active")
+            {
+                int? statusId =  _configDataService.GetStatusShopIdByStatusShopName("active");
+                result = _shopService.UpdateStatusShopIdByShopId(shopId, statusId.Value);
+            }
+            else if (statusName == "reject")
+            {
+                int? statusId = _configDataService.GetStatusShopIdByStatusShopName("reject");
+                result = _shopService.UpdateStatusShopIdByShopId(shopId, statusId.Value);
+            }
+            else
+            {
+                return BadRequest(new { message = "Trạng thái không hợp lệ. Chỉ chấp nhận active hoặc reject." });
+            }
+
+            if (result)
+            {
+                return Ok(new { message = "Cập nhật trạng thái thành công." });
+            }
+            else
+            {
+                return NotFound(new { message = "Không tìm thấy cửa hàng hoặc lỗi khi cập nhật." });
+            }
+        }
     }
 }
