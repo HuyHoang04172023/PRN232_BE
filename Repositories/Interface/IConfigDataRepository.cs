@@ -8,8 +8,9 @@ namespace Repositories.Interface
 {
     public interface IConfigDataRepository
     {
-        public int? GetStatusShopIdByStatusShopName(string statusName);
-        public int? GetStatusProductIdByStatusProductName(string statusName);
-        public int? GetStatusOrderIdByStatusOrderName(string statusName);
+        int? GetStatusShopIdByStatusShopName(string statusName);
+        int? GetStatusProductIdByStatusProductName(string statusName);
+        int? GetStatusOrderIdByStatusOrderName(string statusName);
+        int? GetRoleIdByRoleName(string roleName);
     }
 }

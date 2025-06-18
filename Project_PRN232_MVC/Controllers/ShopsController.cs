@@ -21,13 +21,14 @@ namespace Project_PRN232_MVC.Controllers
         private readonly Prn222BeverageWebsiteProjectContext _context;
         private readonly ShopService _shopService;
         private readonly ConfigDataService _configDataService;
-
+        private readonly UserService _userService;
 
         public ShopsController(Prn222BeverageWebsiteProjectContext context)
         {
             _context = context;
             _shopService = new ShopService();
             _configDataService = new ConfigDataService();
+            _userService = new UserService();
         }
 
         // GET: api/Shops
@@ -193,6 +194,9 @@ namespace Project_PRN232_MVC.Controllers
             {
                 int? statusId =  _configDataService.GetStatusShopIdByStatusShopName("active");
                 result = _shopService.UpdateStatusShopIdByShopId(shopId, statusId.Value);
+
+                int? roleId = _configDataService.GetRoleIdByRoleName("sale");
+                _userService.UpdateRoleUserByShopId(shopId, roleId.Value);
             }
             else if (statusName == "reject")
             {

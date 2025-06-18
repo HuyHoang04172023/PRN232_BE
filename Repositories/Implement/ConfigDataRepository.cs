@@ -31,5 +31,10 @@ namespace Repositories.Implement
         {
             return _configDataDao.GetStatusOrderIdByStatusOrderName(statusName) ;
         }
+
+        public int? GetRoleIdByRoleName(string roleName)
+        {
+            return _configDataDao.GetRoleIdByRoleName(roleName);
+        }
     }
 }

@@ -38,5 +38,13 @@ namespace DataAccessObjects
                 .Select(s => (int?)s.StatusOrderId)
                 .FirstOrDefault();
         }
+
+        public int? GetRoleIdByRoleName(string roleName)
+        {
+            return _context.Roles
+                .Where(r => r.RoleName == roleName)
+                .Select(r => (int?)r.RoleId)
+                .FirstOrDefault();
+        }
     }
 }

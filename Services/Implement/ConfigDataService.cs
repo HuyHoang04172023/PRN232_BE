@@ -31,5 +31,10 @@ namespace Services.Implement
         {
             return _configDataRepository.GetStatusOrderIdByStatusOrderName(statusName);
         }
+
+        public int? GetRoleIdByRoleName(string roleName)
+        {
+            return _configDataRepository.GetRoleIdByRoleName(roleName);
+        }
     }
 }
