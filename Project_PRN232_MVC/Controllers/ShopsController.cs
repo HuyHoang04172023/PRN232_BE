@@ -103,6 +103,7 @@ namespace Project_PRN232_MVC.Controllers
         }
 
         // GET: api/Shops/5
+        [Authorize(Policy = "UserOnly")]
         [HttpGet("{userId}")]
         public async Task<ActionResult<ShopResponse>> GetShopByUserId(int userId)
         {
@@ -132,6 +133,7 @@ namespace Project_PRN232_MVC.Controllers
 
         // PUT: api/Shops/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "UserOnly")]
         [HttpPut("{shopId}")]
         public async Task<IActionResult> PutShop(int shopId, UpdateShopRequest shopRequest)
         {
@@ -161,6 +163,7 @@ namespace Project_PRN232_MVC.Controllers
         }
 
         // DELETE: api/Shops/5
+        [Authorize(Policy = "UserOnly")]
         [HttpDelete("{shopId}")]
         public IActionResult DeleteShop(int shopId)
         {
