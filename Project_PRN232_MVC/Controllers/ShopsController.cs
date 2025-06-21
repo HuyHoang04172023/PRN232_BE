@@ -185,6 +185,8 @@ namespace Project_PRN232_MVC.Controllers
             return NoContent();
         }
 
+        // POST: api/Shops/update-status/5
+        [Authorize(Policy = "ManagerOnly")]
         [HttpPost("update-status/{shopId}")]
         public IActionResult UpdateShopStatus(int shopId, [FromQuery] string statusName)
         {

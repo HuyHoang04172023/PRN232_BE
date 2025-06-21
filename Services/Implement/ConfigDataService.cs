@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.Models;
 using Repositories.Implement;
 using Services.Interface;
 
@@ -35,6 +36,11 @@ namespace Services.Implement
         public int? GetRoleIdByRoleName(string roleName)
         {
             return _configDataRepository.GetRoleIdByRoleName(roleName);
+        }
+
+        public List<ProductSize> GetProductSizes()
+        {
+            return _configDataRepository.GetProductSizes();
         }
     }
 }

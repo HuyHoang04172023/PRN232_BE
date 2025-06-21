@@ -106,6 +106,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("UserOnly",
         policyBuilder => policyBuilder.RequireClaim("Role", "user"));
 
+    options.AddPolicy("ManagerOnly",
+        policyBuilder => policyBuilder.RequireClaim("Role", "manager"));
+
     options.AddPolicy("AdminOrStaffOrMember",
         policyBuilder => policyBuilder.RequireClaim("Role", "admin", "staff", "member", "manager"));
 });

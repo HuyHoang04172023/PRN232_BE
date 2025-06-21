@@ -46,5 +46,10 @@ namespace DataAccessObjects
                 .Select(r => (int?)r.RoleId)
                 .FirstOrDefault();
         }
+
+        public List<ProductSize> GetProductSizes()
+        {
+            return _context.ProductSizes.ToList();
+        }
     }
 }

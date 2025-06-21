@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.Models;
 
 namespace Services.Interface
 {
@@ -12,5 +13,6 @@ namespace Services.Interface
         int? GetStatusProductIdByStatusProductName(string statusName);
         int? GetStatusOrderIdByStatusOrderName(string statusName);
         int? GetRoleIdByRoleName(string roleName);
+        List<ProductSize> GetProductSizes();
     }
 }

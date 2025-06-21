@@ -139,6 +139,22 @@ namespace Project_PRN232_MVC.Controllers
                 return BadRequest(new { message = "Cần ít nhất một biến thể sản phẩm." });
             }
 
+            // ✅ Validate không trùng size
+            var duplicateSizeIds = request.ProductVariants
+                .GroupBy(v => v.ProductSizeId)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (duplicateSizeIds.Any())
+            {
+                return BadRequest(new
+                {
+                    message = "Mỗi size chỉ được xuất hiện một lần trong biến thể sản phẩm.",
+                    duplicatedSizes = duplicateSizeIds
+                });
+            }
+
             try
             {
                 var product = _context.Products
@@ -154,15 +170,39 @@ namespace Project_PRN232_MVC.Controllers
                 product.ProductDescription = request.ProductDescription;
                 product.ProductImage = request.ProductImage;
 
-                _context.ProductVariants.RemoveRange(product.ProductVariants);
+                var existingVariants = product.ProductVariants.ToList();
+                var incomingSizeIds = request.ProductVariants.Select(v => v.ProductSizeId).ToList();
 
-                foreach (var variant in request.ProductVariants)
+                foreach (var variant in existingVariants)
                 {
-                    product.ProductVariants.Add(new ProductVariant
+                    if (!incomingSizeIds.Contains(variant.ProductSizeId))
                     {
-                        ProductVariantPrice = variant.ProductVariantPrice,
-                        ProductSizeId = variant.ProductSizeId
-                    });
+                        bool isInUse = _context.OrderItems.Any(o => o.ProductVariantId == variant.ProductVariantId);
+                        if (!isInUse)
+                        {
+                            _context.ProductVariants.Remove(variant);
+                        }
+                    }
+                }
+
+                foreach (var variantRequest in request.ProductVariants)
+                {
+                    var existing = existingVariants
+                        .FirstOrDefault(v => v.ProductSizeId == variantRequest.ProductSizeId);
+
+                    if (existing != null)
+                    {
+                        existing.ProductVariantPrice = variantRequest.ProductVariantPrice;
+                    }
+                    else
+                    {
+                        product.ProductVariants.Add(new ProductVariant
+                        {
+                            ProductSizeId = variantRequest.ProductSizeId,
+                            ProductVariantPrice = variantRequest.ProductVariantPrice,
+                            ProductId = product.ProductId
+                        });
+                    }
                 }
 
                 _context.SaveChanges();
@@ -171,7 +211,11 @@ namespace Project_PRN232_MVC.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi cập nhật sản phẩm", error = ex.Message });
+                return StatusCode(500, new
+                {
+                    message = "Lỗi khi cập nhật sản phẩm",
+                    error = ex.InnerException?.Message ?? ex.Message
+                });
             }
         }
 
