@@ -56,5 +56,10 @@ namespace Repositories.Implement
         {
             return _shopDao.UpdateStatusShopIdByShopId(shopId, statusShopId);
         }
+
+        public int? GetShopIdByUserId(int userId)
+        {
+            return _shopDao.GetShopIdByUserId(userId);
+        }
     }
 }

@@ -59,5 +59,10 @@ namespace Services.Implement
         {
             return _shopRepository.UpdateStatusShopIdByShopId(shopId, statusShopId);
         }
+
+        public int? GetShopIdByUserId(int userId)
+        {
+            return _shopRepository.GetShopIdByUserId(userId);
+        }
     }
 }

@@ -100,6 +100,7 @@ namespace DataAccessObjects
                 return false;
             }
         }
+
         public bool UpdateStatusShopIdByShopId(int shopId, int statusShopId)
         {
             var shop = _context.Shops.FirstOrDefault(s => s.ShopId == shopId);
@@ -122,5 +123,12 @@ namespace DataAccessObjects
             }
         }
 
+        public int? GetShopIdByUserId(int userId)
+        {
+            var shop = _context.Shops
+                .FirstOrDefault(s => s.CreatedBy == userId);
+
+            return shop?.ShopId;
+        }
     }
 }

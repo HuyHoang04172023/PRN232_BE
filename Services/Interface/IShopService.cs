@@ -17,5 +17,6 @@ namespace Services.Interface
         bool UpdateShop(int shopId, Shop shopUpdate);
         bool DeleteShop(int shopId);
         bool UpdateStatusShopIdByShopId(int shopId, int statusShopId);
+        int? GetShopIdByUserId(int userId);
     }
 }
