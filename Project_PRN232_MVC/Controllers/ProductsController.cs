@@ -37,48 +37,46 @@ namespace Project_PRN232_MVC.Controllers
         }
 
         // GET: api/Products/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        [HttpGet("{productId}")]
+        public IActionResult GetProductById(int productId)
         {
-            var product = await _context.Products.FindAsync(id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return product;
-        }
-
-        // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
-        {
-            if (id != product.ProductId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(product).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                var product = _context.Products
+                    .Include(p => p.ProductVariants)
+                    .Include(p => p.Shop)
+                    .Include(p => p.StatusProduct)
+                    .FirstOrDefault(p => p.ProductId == productId);
 
-            return NoContent();
+                if (product == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy sản phẩm." });
+                }
+
+                var response = new ProductResponse
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    ProductDescription = product.ProductDescription,
+                    ProductImage = product.ProductImage,
+                    StatusProductId = product.StatusProductId,
+                    StatusProductName = product.StatusProduct?.StatusProductName,
+                    ProductSoldCount = product.ProductSoldCount,
+                    ProductLike = product.ProductLike,
+                    ProductVariants = product.ProductVariants.Select(v => new ProductVariantResponse
+                    {
+                        ProductVariantId = v.ProductVariantId,
+                        ProductVariantPrice = v.ProductVariantPrice,
+                        ProductSizeId = v.ProductSizeId
+                    }).ToList()
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy sản phẩm", error = ex.Message });
+            }
         }
 
         // POST: api/Products
@@ -131,25 +129,126 @@ namespace Project_PRN232_MVC.Controllers
             }
         }
 
-        // DELETE: api/Products/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        // PUT: api/Products/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{productId}")]
+        public IActionResult UpdateProduct(int productId, [FromBody] ProductUpdateRequest request)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            if (request.ProductVariants == null || !request.ProductVariants.Any())
             {
-                return NotFound();
+                return BadRequest(new { message = "Cần ít nhất một biến thể sản phẩm." });
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var product = _context.Products
+                    .Include(p => p.ProductVariants)
+                    .FirstOrDefault(p => p.ProductId == productId);
 
-            return NoContent();
+                if (product == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy sản phẩm cần cập nhật." });
+                }
+
+                product.ProductName = request.ProductName;
+                product.ProductDescription = request.ProductDescription;
+                product.ProductImage = request.ProductImage;
+
+                _context.ProductVariants.RemoveRange(product.ProductVariants);
+
+                foreach (var variant in request.ProductVariants)
+                {
+                    product.ProductVariants.Add(new ProductVariant
+                    {
+                        ProductVariantPrice = variant.ProductVariantPrice,
+                        ProductSizeId = variant.ProductSizeId
+                    });
+                }
+
+                _context.SaveChanges();
+
+                return Ok(new { message = "Cập nhật sản phẩm thành công." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi cập nhật sản phẩm", error = ex.Message });
+            }
         }
 
-        private bool ProductExists(int id)
+        // DELETE: api/Products/5
+        [HttpDelete("{productId}")]
+        public IActionResult DeleteProduct(int productId)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            try
+            {
+                var product = _context.Products
+                    .Include(p => p.ProductVariants)
+                    .FirstOrDefault(p => p.ProductId == productId);
+
+                if (product == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy sản phẩm cần xóa." });
+                }
+
+                _context.ProductVariants.RemoveRange(product.ProductVariants);
+
+                _context.Products.Remove(product);
+
+                _context.SaveChanges();
+
+                return Ok(new { message = "Xóa sản phẩm thành công." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi xóa sản phẩm", error = ex.Message });
+            }
         }
+
+        [HttpGet("status/{statusName}")]
+        public IActionResult GetProductsByStatusProductName(string statusName)
+        {
+            try
+            {
+                var status = _context.StatusProducts
+                    .FirstOrDefault(s => s.StatusProductName.ToLower() == statusName.ToLower());
+
+                if (status == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy trạng thái sản phẩm." });
+                }
+
+                var products = _context.Products
+                    .Where(p => p.StatusProductId == status.StatusProductId)
+                    .Include(p => p.ProductVariants)
+                    .Include(p => p.Shop)
+                    .Include(p => p.StatusProduct)
+                    .ToList();
+
+                var response = products.Select(product => new ProductResponse
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    ProductDescription = product.ProductDescription,
+                    ProductImage = product.ProductImage,
+                    StatusProductId = product.StatusProductId,
+                    StatusProductName = product.StatusProduct?.StatusProductName,
+                    ProductSoldCount = product.ProductSoldCount,
+                    ProductLike = product.ProductLike,
+                    ProductVariants = product.ProductVariants.Select(v => new ProductVariantResponse
+                    {
+                        ProductVariantId = v.ProductVariantId,
+                        ProductVariantPrice = v.ProductVariantPrice,
+                        ProductSizeId = v.ProductSizeId
+                    }).ToList()
+                }).ToList();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách sản phẩm", error = ex.Message });
+            }
+        }
+
     }
 }
