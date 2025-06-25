@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObjects.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,9 @@ namespace Services.Interface
 {
     public interface IProductService
     {
+        Product CreateProduct(Product product);
+        Product? GetProductByProductId(int productId);
+        List<int> GetDuplicatedSizeIds(List<ProductVariant> variants);
+        bool DeleteProduct(Product product);
     }
 }

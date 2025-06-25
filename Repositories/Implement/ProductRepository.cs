@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.Models;
 using DataAccessObjects;
 using Repositories.Interface;
 
@@ -15,6 +16,26 @@ namespace Repositories.Implement
         public ProductRepository()
         {
             _productDao = new ProductDAO();
+        }
+
+        public Product CreateProduct(Product product)
+        {
+            return _productDao.CreateProduct(product);
+        }
+
+        public bool DeleteProduct(Product product)
+        {
+            return _productDao.DeleteProduct(product);
+        }
+
+        public List<int> GetDuplicatedSizeIds(List<ProductVariant> variants)
+        {
+            return _productDao.GetDuplicatedSizeIds(variants);
+        }
+
+        public Product? GetProductByProductId(int productId)
+        {
+            return _productDao.GetProductByProductId(productId);
         }
     }
 }

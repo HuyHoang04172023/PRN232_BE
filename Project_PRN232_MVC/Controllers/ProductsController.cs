@@ -20,6 +20,7 @@ namespace Project_PRN232_MVC.Controllers
         private readonly ShopService _shopService;
         private readonly ConfigDataService _configDataService;
         private readonly UserService _userService;
+        private readonly ProductService _productService;
 
         public ProductsController()
         {
@@ -27,6 +28,7 @@ namespace Project_PRN232_MVC.Controllers
             _shopService = new ShopService();
             _configDataService = new ConfigDataService();
             _userService = new UserService();
+            _productService = new ProductService();
         }
 
         // GET: api/Products
@@ -42,11 +44,7 @@ namespace Project_PRN232_MVC.Controllers
         {
             try
             {
-                var product = _context.Products
-                    .Include(p => p.ProductVariants)
-                    .Include(p => p.Shop)
-                    .Include(p => p.StatusProduct)
-                    .FirstOrDefault(p => p.ProductId == productId);
+                Product? product = _productService.GetProductByProductId(productId);
 
                 if (product == null)
                 {
@@ -133,8 +131,7 @@ namespace Project_PRN232_MVC.Controllers
                     });
                 }
 
-                _context.Products.Add(newProduct);
-                _context.SaveChanges();
+                _productService.CreateProduct(newProduct);
 
                 return Ok(new { message = "Tạo sản phẩm thành công", productId = newProduct.ProductId });
             }
@@ -176,9 +173,7 @@ namespace Project_PRN232_MVC.Controllers
 
             try
             {
-                var product = _context.Products
-                    .Include(p => p.ProductVariants)
-                    .FirstOrDefault(p => p.ProductId == productId);
+                var product = _productService.GetProductByProductId(productId);
 
                 if (product == null)
                 {
@@ -244,20 +239,19 @@ namespace Project_PRN232_MVC.Controllers
         {
             try
             {
-                var product = _context.Products
-                    .Include(p => p.ProductVariants)
-                    .FirstOrDefault(p => p.ProductId == productId);
+                var product = _productService.GetProductByProductId(productId);
 
                 if (product == null)
                 {
                     return NotFound(new { message = "Không tìm thấy sản phẩm cần xóa." });
                 }
 
-                _context.ProductVariants.RemoveRange(product.ProductVariants);
+                bool result = _productService.DeleteProduct(product);
 
-                _context.Products.Remove(product);
-
-                _context.SaveChanges();
+                if (!result)
+                {
+                    return BadRequest(new { message = "Không thể xóa sản phẩm. Có thể sản phẩm đang được sử dụng ở nơi khác." });
+                }
 
                 return Ok(new { message = "Xóa sản phẩm thành công." });
             }
@@ -313,5 +307,37 @@ namespace Project_PRN232_MVC.Controllers
             }
         }
 
+        [HttpPut("update-status")]
+        public async Task<IActionResult> UpdateProductStatus(int productId, string statusName)
+        {
+            // Kiểm tra sản phẩm có tồn tại không
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+            {
+                return NotFound(new { message = "Không tìm thấy sản phẩm với mã đã cung cấp." });
+            }
+
+            // Kiểm tra trạng thái có hợp lệ không
+            var status = await _context.StatusProducts
+                .FirstOrDefaultAsync(s => s.StatusProductName.ToLower() == statusName.ToLower());
+
+            if (status == null)
+            {
+                return NotFound(new { message = "Trạng thái sản phẩm không hợp lệ." });
+            }
+
+            try
+            {
+                // Cập nhật trạng thái sản phẩm
+                product.StatusProductId = status.StatusProductId;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Cập nhật trạng thái sản phẩm thành công." });
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(500, new { message = "Có lỗi xảy ra khi cập nhật dữ liệu. Vui lòng thử lại sau." });
+            }
+        }
     }
 }
