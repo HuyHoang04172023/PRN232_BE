@@ -42,5 +42,10 @@ namespace Repositories.Implement
         {
             return _configDataDao.GetProductSizes();
         }
+
+        public bool CheckStatusProductExist(string productStatusName)
+        {
+            return _configDataDao.CheckStatusProductExist(productStatusName);
+        }
     }
 }

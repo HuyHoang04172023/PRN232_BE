@@ -14,5 +14,6 @@ namespace Repositories.Interface
         List<int> GetDuplicatedSizeIds(List<ProductVariant> variants);
         bool DeleteProduct(Product product);
         bool UpdateStatusProductIdByProductId(int productId, int statusProductId);
+        List<Product> GetProductsByStatusName(string statusName);
     }
 }

@@ -42,5 +42,10 @@ namespace Services.Implement
         {
             return _configDataRepository.GetProductSizes();
         }
+
+        public bool CheckStatusProductExist(string productStatusName)
+        {
+            return _configDataRepository.CheckStatusProductExist(productStatusName);
+        }
     }
 }

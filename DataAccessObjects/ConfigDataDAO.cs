@@ -51,5 +51,11 @@ namespace DataAccessObjects
         {
             return _context.ProductSizes.ToList();
         }
+
+        public bool CheckStatusProductExist(string productStatusName)
+        {
+            return _context.StatusProducts
+                .Any(s => s.StatusProductName.ToLower() == productStatusName.ToLower());
+        }
     }
 }

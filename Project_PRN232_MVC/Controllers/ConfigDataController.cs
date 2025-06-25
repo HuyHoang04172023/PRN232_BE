@@ -27,23 +27,6 @@ namespace Project_PRN232_MVC.Controllers
         {
             try
             {
-                //List<Shop> shops = _shopService.GetShops();
-
-                //var response = shops.Select(s => new ShopResponse
-                //{
-                //    ShopId = s.ShopId,
-                //    ShopName = s.ShopName,
-                //    ShopAddress = s.ShopAddress,
-                //    ShopImage = s.ShopImage,
-                //    ShopDescription = s.ShopDescription,
-                //    StatusShopId = s.StatusShopId,
-                //    CreatedBy = s.CreatedBy,
-                //    CreatedAt = s.CreatedAt,
-                //    ApprovedBy = s.ApprovedBy,
-                //    StatusShop = s.StatusShop != null ? s.StatusShop.StatusShopName : null
-                //}).ToList();
-
-                //return Ok(response);
                 List<ProductSize> productSizes = _configDataService.GetProductSizes();
 
                 var response = productSizes.Select(s => new ProductSizeResponse

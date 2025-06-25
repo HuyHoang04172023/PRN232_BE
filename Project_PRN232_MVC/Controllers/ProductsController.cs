@@ -266,20 +266,14 @@ namespace Project_PRN232_MVC.Controllers
         {
             try
             {
-                var status = _context.StatusProducts
-                    .FirstOrDefault(s => s.StatusProductName.ToLower() == statusName.ToLower());
+                bool status = _configDataService.CheckStatusProductExist(statusName);
 
-                if (status == null)
+                if (!status)
                 {
                     return NotFound(new { message = "Không tìm thấy trạng thái sản phẩm." });
                 }
 
-                var products = _context.Products
-                    .Where(p => p.StatusProductId == status.StatusProductId)
-                    .Include(p => p.ProductVariants)
-                    .Include(p => p.Shop)
-                    .Include(p => p.StatusProduct)
-                    .ToList();
+                var products = _productService.GetProductsByStatusName(statusName);
 
                 var response = products.Select(product => new ProductResponse
                 {

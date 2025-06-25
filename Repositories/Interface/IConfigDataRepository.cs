@@ -14,5 +14,6 @@ namespace Repositories.Interface
         int? GetStatusOrderIdByStatusOrderName(string statusName);
         int? GetRoleIdByRoleName(string roleName);
         List<ProductSize> GetProductSizes();
+        bool CheckStatusProductExist(string productStatusName);
     }
 }

@@ -57,6 +57,16 @@ namespace DataAccessObjects
             }
         }
 
+        public List<Product> GetProductsByStatusName(string statusName)
+        {
+            return _context.Products
+                .Include(p => p.ProductVariants)
+                .Include(p => p.Shop)
+                .Include(p => p.StatusProduct)
+                .Where(p => p.StatusProduct.StatusProductName == statusName)
+                .ToList();
+        }
+
         public bool UpdateStatusProductIdByProductId(int productId, int statusProductId)
         {
             var product = _context.Products.FirstOrDefault(p => p.ProductId == productId);
