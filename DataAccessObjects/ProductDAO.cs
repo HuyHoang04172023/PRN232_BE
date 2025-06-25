@@ -56,5 +56,27 @@ namespace DataAccessObjects
                 return false;
             }
         }
+
+        public bool UpdateStatusProductIdByProductId(int productId, int statusProductId)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.ProductId == productId);
+
+            if (product == null)
+            {
+                return false;
+            }
+
+            product.StatusProductId = statusProductId;
+
+            try
+            {
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

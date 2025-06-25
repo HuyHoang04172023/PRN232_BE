@@ -38,5 +38,10 @@ namespace Services.Implement
         {
             return _productRepository.GetProductByProductId(productId);
         }
+
+        public bool UpdateStatusProductIdByProductId(int productId, int statusProductId)
+        {
+            return _productRepository.UpdateStatusProductIdByProductId(productId, statusProductId);
+        }
     }
 }

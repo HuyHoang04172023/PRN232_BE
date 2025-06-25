@@ -37,5 +37,10 @@ namespace Repositories.Implement
         {
             return _productDao.GetProductByProductId(productId);
         }
+
+        public bool UpdateStatusProductIdByProductId(int productId, int statusProductId)
+        {
+            return _productDao.UpdateStatusProductIdByProductId(productId, statusProductId);
+        }
     }
 }

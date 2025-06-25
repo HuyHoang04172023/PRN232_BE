@@ -291,6 +291,8 @@ namespace Project_PRN232_MVC.Controllers
                     StatusProductName = product.StatusProduct?.StatusProductName,
                     ProductSoldCount = product.ProductSoldCount,
                     ProductLike = product.ProductLike,
+                    ShopId = product.ShopId,
+                    ShopName = product.Shop.ShopName,
                     ProductVariants = product.ProductVariants.Select(v => new ProductVariantResponse
                     {
                         ProductVariantId = v.ProductVariantId,
@@ -307,36 +309,21 @@ namespace Project_PRN232_MVC.Controllers
             }
         }
 
-        [HttpPut("update-status")]
+        [HttpPost("update-status/{productId}")]
         public async Task<IActionResult> UpdateProductStatus(int productId, string statusName)
         {
-            // Kiểm tra sản phẩm có tồn tại không
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null)
+            bool result = false;
+
+            int? statusId = _configDataService.GetStatusProductIdByStatusProductName(statusName);
+            result = _productService.UpdateStatusProductIdByProductId(productId, (int) statusId);
+
+            if (result)
             {
-                return NotFound(new { message = "Không tìm thấy sản phẩm với mã đã cung cấp." });
+                return Ok(new { message = "Cập nhật trạng thái thành công." });
             }
-
-            // Kiểm tra trạng thái có hợp lệ không
-            var status = await _context.StatusProducts
-                .FirstOrDefaultAsync(s => s.StatusProductName.ToLower() == statusName.ToLower());
-
-            if (status == null)
+            else
             {
-                return NotFound(new { message = "Trạng thái sản phẩm không hợp lệ." });
-            }
-
-            try
-            {
-                // Cập nhật trạng thái sản phẩm
-                product.StatusProductId = status.StatusProductId;
-                await _context.SaveChangesAsync();
-
-                return Ok(new { message = "Cập nhật trạng thái sản phẩm thành công." });
-            }
-            catch (DbUpdateException)
-            {
-                return StatusCode(500, new { message = "Có lỗi xảy ra khi cập nhật dữ liệu. Vui lòng thử lại sau." });
+                return NotFound(new { message = "Không tìm thấy cửa hàng hoặc lỗi khi cập nhật." });
             }
         }
     }

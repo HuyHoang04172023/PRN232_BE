@@ -19,6 +19,8 @@ namespace BusinessObjects.ModelsDTO.Product
         public int? ProductSoldCount { get; set; }
         public int? ProductLike { get; set; }
 
+        public int ShopId { get; set; }
+        public string ShopName { get; set; }
         public List<ProductVariantResponse> ProductVariants { get; set; } = new();
     }
 }
