@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BusinessObjects.Models;
 
@@ -15,6 +14,10 @@ public partial class Prn222BeverageWebsiteProjectContext : DbContext
         : base(options)
     {
     }
+
+    public virtual DbSet<Cart> Carts { get; set; }
+
+    public virtual DbSet<CartItem> CartItems { get; set; }
 
     public virtual DbSet<Like> Likes { get; set; }
 
@@ -44,21 +47,49 @@ public partial class Prn222BeverageWebsiteProjectContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("server=(local);database=PRN222_Beverage_Website_Project;uid=hoang;pwd=123;Trusted_Connection=True;Encrypt=False;");
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var ConnectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("DefaultConnection");
-            optionsBuilder.UseSqlServer(ConnectionString);
-        }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("server=(local);database=PRN222_Beverage_Website_Project;uid=sa;pwd=123;Trusted_Connection=True;Encrypt=False;");
 
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.ToTable("Cart");
+
+            entity.Property(e => e.CartId)
+                .ValueGeneratedNever()
+                .HasColumnName("CartID");
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Cart_Users");
+        });
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.ToTable("CartItem");
+
+            entity.Property(e => e.CartItemId)
+                .ValueGeneratedNever()
+                .HasColumnName("CartItemID");
+            entity.Property(e => e.CartId).HasColumnName("CartID");
+            entity.Property(e => e.ProductVariantId).HasColumnName("ProductVariantID");
+
+            entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.CartId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CartItem_Cart");
+
+            entity.HasOne(d => d.ProductVariant).WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.ProductVariantId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CartItem_ProductVariants");
+        });
+
         modelBuilder.Entity<Like>(entity =>
         {
             entity.Property(e => e.LikeId).HasColumnName("LikeID");
