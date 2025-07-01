@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BusinessObjects.Models;
+using BusinessObjects.ModelsDTO.Product;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BusinessObjects.Models;
 using Services.Implement;
 using Services.Interface;
-using BusinessObjects.ModelsDTO.Product;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Project_PRN232_MVC.Controllers
 {
@@ -79,6 +80,7 @@ namespace Project_PRN232_MVC.Controllers
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "SaleOnly")]
         [HttpPost]
         public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
         {
@@ -147,6 +149,7 @@ namespace Project_PRN232_MVC.Controllers
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "SaleOnly")]
         [HttpPut("{productId}")]
         public IActionResult UpdateProduct(int productId, [FromBody] ProductUpdateRequest request)
         {
@@ -234,6 +237,7 @@ namespace Project_PRN232_MVC.Controllers
         }
 
         // DELETE: api/Products/5
+        [Authorize(Policy = "SaleOnly")]
         [HttpDelete("{productId}")]
         public IActionResult DeleteProduct(int productId)
         {
@@ -303,6 +307,7 @@ namespace Project_PRN232_MVC.Controllers
             }
         }
 
+        [Authorize(Policy = "ManagerOnly")]
         [HttpPost("update-status/{productId}")]
         public async Task<IActionResult> UpdateProductStatus(int productId, string statusName)
         {
