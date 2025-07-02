@@ -32,6 +32,16 @@ namespace DataAccessObjects
                 .FirstOrDefault(p => p.ProductId == productId);
         }
 
+        public List<Product> GetProductsByShopId(int shopId)
+        {
+            return _context.Products
+                .Include(p => p.ProductVariants)
+                .Include(p => p.Shop)
+                .Include(p => p.StatusProduct)
+                .Where(p => p.Shop.ShopId == shopId && p.StatusProduct.StatusProductName == "active")
+                .ToList();
+        }
+
         public List<int> GetDuplicatedSizeIds(List<ProductVariant> variants)
         {
             return variants

@@ -39,6 +39,11 @@ namespace Services.Implement
             return _productRepository.GetProductByProductId(productId);
         }
 
+        public List<Product> GetProductsByShopId(int shopId)
+        {
+            return _productRepository.GetProductsByShopId(shopId);
+        }
+
         public List<Product> GetProductsByStatusName(string statusName)
         {
             return _productRepository.GetProductsByStatusName(statusName);

@@ -15,5 +15,6 @@ namespace Repositories.Interface
         bool DeleteProduct(Product product);
         bool UpdateStatusProductIdByProductId(int productId, int statusProductId);
         List<Product> GetProductsByStatusName(string statusName);
+        List<Product> GetProductsByShopId(int shopId);
     }
 }

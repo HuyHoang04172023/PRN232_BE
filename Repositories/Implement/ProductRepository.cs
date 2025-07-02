@@ -38,6 +38,11 @@ namespace Repositories.Implement
             return _productDao.GetProductByProductId(productId);
         }
 
+        public List<Product> GetProductsByShopId(int shopId)
+        {
+            return _productDao.GetProductsByShopId(shopId);
+        }
+
         public List<Product> GetProductsByStatusName(string statusName)
         {
             return _productDao.GetProductsByStatusName(statusName);

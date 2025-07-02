@@ -78,6 +78,45 @@ namespace Project_PRN232_MVC.Controllers
             }
         }
 
+        [HttpGet("shop/{shopId}")]
+        public IActionResult GetProductByShopId(int shopId)
+        {
+            try
+            {
+                List<Product> products = _productService.GetProductsByShopId(shopId);
+
+                if (products == null || !products.Any())
+                {
+                    return NotFound(new { message = "Không tìm thấy sản phẩm." });
+                }
+
+                var response = products.Select(product => new ProductResponse
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    ProductDescription = product.ProductDescription,
+                    ProductImage = product.ProductImage,
+                    StatusProductId = product.StatusProductId,
+                    StatusProductName = product.StatusProduct?.StatusProductName,
+                    ProductSoldCount = product.ProductSoldCount,
+                    ProductLike = product.ProductLike,
+                    ProductVariants = product.ProductVariants?.Select(v => new ProductVariantResponse
+                    {
+                        ProductVariantId = v.ProductVariantId,
+                        ProductVariantPrice = v.ProductVariantPrice,
+                        ProductSizeId = v.ProductSizeId
+                    }).ToList()
+                }).ToList();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy sản phẩm", error = ex.Message });
+            }
+        }
+
+
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Policy = "SaleOnly")]
