@@ -29,10 +29,48 @@ public class CartController : ControllerBase
                 .ThenInclude(ci => ci.ProductVariant.Product)
             .FirstOrDefaultAsync(c => c.UserId == userId);
 
-        if (cart == null)
-            return Ok(new { CartItems = new List<object>() });
+        CartResponse? cartResponse = null;
 
-        return Ok(cart);
+        if (cart != null)
+        {
+            cartResponse = new CartResponse
+            {
+                CartId = cart.CartId,
+                UserId = cart.UserId,
+                CartItems = cart.CartItems.Select(ci => new CartItemResponse
+                {
+                    CartItemId = ci.CartItemId,
+                    ProductVariantId = ci.ProductVariantId,
+                    Quantity = ci.Quantity,
+                    ProductVariant = new ProductVariantResponse
+                    {
+                        ProductVariantPrice = ci.ProductVariant.ProductVariantPrice,
+                        ProductSize = new ProductSizeResponse
+                        {
+                            ProductSizeName = ci.ProductVariant.ProductSize.ProductSizeName
+                        },
+                        Product = new ProductResponse
+                        {
+                            ProductName = ci.ProductVariant.Product.ProductName,
+                            ProductImage = ci.ProductVariant.Product.ProductImage
+                        }
+                    }
+                }).ToList()
+            };
+        }
+
+        // Trả về response
+        if (cartResponse == null)
+        {
+            return Ok(new CartResponse
+            {
+                CartId = 0,
+                UserId = userId,
+                CartItems = new List<CartItemResponse>()
+            });
+        }
+
+        return Ok(cartResponse);
     }
 
     // [POST] api/cart/{userId}/add

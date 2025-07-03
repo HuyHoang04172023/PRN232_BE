@@ -57,9 +57,7 @@ public partial class Prn222BeverageWebsiteProjectContext : DbContext
         {
             entity.ToTable("Cart");
 
-            entity.Property(e => e.CartId)
-                .ValueGeneratedNever()
-                .HasColumnName("CartID");
+            entity.Property(e => e.CartId).HasColumnName("CartID");
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
@@ -73,9 +71,7 @@ public partial class Prn222BeverageWebsiteProjectContext : DbContext
         {
             entity.ToTable("CartItem");
 
-            entity.Property(e => e.CartItemId)
-                .ValueGeneratedNever()
-                .HasColumnName("CartItemID");
+            entity.Property(e => e.CartItemId).HasColumnName("CartItemID");
             entity.Property(e => e.CartId).HasColumnName("CartID");
             entity.Property(e => e.ProductVariantId).HasColumnName("ProductVariantID");
 
