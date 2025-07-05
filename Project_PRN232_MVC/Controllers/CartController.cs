@@ -146,10 +146,10 @@ public class CartController : ControllerBase
         if (item == null)
             return NotFound("Item not found");
 
-        cart.CartItems.Remove(item);
+        _context.CartItems.Remove(item);
         await _context.SaveChangesAsync();
 
-        return Ok(cart);
+        return Ok(new { message = "Item removed successfully" });
     }
 
     // [DELETE] api/cart/{userId}/clear
