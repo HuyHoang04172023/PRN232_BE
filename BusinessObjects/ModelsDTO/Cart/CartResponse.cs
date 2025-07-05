@@ -37,6 +37,8 @@ namespace BusinessObjects.ModelsDTO.Cart
     {
         public string ProductName { get; set; }
         public string ProductImage { get; set; }
+        public int ShopId { get; set; }
+        public string ShopName { get; set; }
     }
 
 }

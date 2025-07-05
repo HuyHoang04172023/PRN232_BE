@@ -26,7 +26,9 @@ public class CartController : ControllerBase
                 .ThenInclude(ci => ci.ProductVariant)
                     .ThenInclude(pv => pv.ProductSize)
             .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.ProductVariant.Product)
+                .ThenInclude(ci => ci.ProductVariant)
+                    .ThenInclude(pv => pv.Product)
+                        .ThenInclude(p => p.Shop)
             .FirstOrDefaultAsync(c => c.UserId == userId);
 
         CartResponse? cartResponse = null;
@@ -52,14 +54,15 @@ public class CartController : ControllerBase
                         Product = new ProductResponse
                         {
                             ProductName = ci.ProductVariant.Product.ProductName,
-                            ProductImage = ci.ProductVariant.Product.ProductImage
+                            ProductImage = ci.ProductVariant.Product.ProductImage,
+                            ShopId = ci.ProductVariant.Product.Shop.ShopId,
+                            ShopName = ci.ProductVariant.Product.Shop.ShopName
                         }
                     }
                 }).ToList()
             };
         }
 
-        // Trả về response
         if (cartResponse == null)
         {
             return Ok(new CartResponse
