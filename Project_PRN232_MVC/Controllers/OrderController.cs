@@ -173,6 +173,10 @@ namespace Project_PRN232_MVC.Controllers
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.ProductVariant)
                         .ThenInclude(pv => pv.Product)
+                            .ThenInclude(p => p.Shop)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ProductVariant)
+                        .ThenInclude(pv => pv.ProductSize)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
             if (order == null)
@@ -200,10 +204,18 @@ namespace Project_PRN232_MVC.Controllers
                 Items = order.OrderItems.Select(oi => new
                 {
                     oi.ProductVariantId,
-                    ProductName = oi.ProductVariant.Product.ProductName,
                     Quantity = oi.OrderItemQuantity,
                     UnitPrice = oi.OrderItemPrice,
-                    Total = oi.OrderItemPrice * oi.OrderItemQuantity
+                    Total = oi.OrderItemPrice * oi.OrderItemQuantity,
+                    Product = new
+                    {
+                        ProductName = oi.ProductVariant.Product.ProductName,
+                        ProductImage = oi.ProductVariant.Product.ProductImage,
+                        ShopId = oi.ProductVariant.Product.Shop.ShopId,
+                        ShopName = oi.ProductVariant.Product.Shop.ShopName,
+                        ProductSize = oi.ProductVariant.ProductSize.ProductSizeName,
+                        ProductPrice = oi.ProductVariant.ProductVariantPrice
+                    }
                 }),
                 TotalAmount = order.OrderItems.Sum(oi => oi.OrderItemPrice * oi.OrderItemQuantity)
             };
