@@ -1,5 +1,5 @@
 ﻿using BusinessObjects.Models;
-using BusinessObjects.ModelsDTO.ProductSize;
+using BusinessObjects.ModelsDTO.ConfigData;
 using BusinessObjects.ModelsDTO.Shop;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +40,27 @@ namespace Project_PRN232_MVC.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Lỗi khi lấy danh sách kích cỡ sản phẩm", error = ex.Message });
+            }
+        }
+
+        [HttpGet("status-orders")]
+        public IActionResult GetAllStatusOrders()
+        {
+            try
+            {
+                List<StatusOrder> statusOrders = _configDataService.GetStatusOrders();
+
+                var response = statusOrders.Select(s => new StatusOrderResponse
+                {
+                    StatusOrderId = s.StatusOrderId,
+                    StatusOrderName = s.StatusOrderName
+                }).ToList();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy trạng thái đơn hàng", error = ex.Message });
             }
         }
     }

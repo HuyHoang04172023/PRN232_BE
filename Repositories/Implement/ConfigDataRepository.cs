@@ -47,5 +47,10 @@ namespace Repositories.Implement
         {
             return _configDataDao.CheckStatusProductExist(productStatusName);
         }
+
+        public List<StatusOrder> GetStatusOrders()
+        {
+            return _configDataDao.GetStatusOrders();
+        }
     }
 }

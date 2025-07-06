@@ -47,5 +47,10 @@ namespace Services.Implement
         {
             return _configDataRepository.CheckStatusProductExist(productStatusName);
         }
+
+        public List<StatusOrder> GetStatusOrders()
+        {
+            return _configDataRepository.GetStatusOrders();
+        }
     }
 }

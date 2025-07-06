@@ -52,6 +52,11 @@ namespace DataAccessObjects
             return _context.ProductSizes.ToList();
         }
 
+        public List<StatusOrder> GetStatusOrders()
+        {
+            return _context.StatusOrders.ToList();
+        }
+
         public bool CheckStatusProductExist(string productStatusName)
         {
             return _context.StatusProducts

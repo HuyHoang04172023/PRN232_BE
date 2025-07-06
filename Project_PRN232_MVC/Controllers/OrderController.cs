@@ -3,6 +3,7 @@ using BusinessObjects.ModelsDTO.Order;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Services.Implement;
 
 namespace Project_PRN232_MVC.Controllers
 {
@@ -11,10 +12,12 @@ namespace Project_PRN232_MVC.Controllers
     public class OrderController : ControllerBase
     {
         private readonly Prn222BeverageWebsiteProjectContext _context;
+        private readonly ConfigDataService _configDataService;
 
         public OrderController()
         {
             _context = new Prn222BeverageWebsiteProjectContext();
+            _configDataService = new ConfigDataService();
         }
 
         [HttpPost]
@@ -139,7 +142,7 @@ namespace Project_PRN232_MVC.Controllers
         }
 
         [HttpPut("update-status/{orderId}")]
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromQuery] int statusOrderId)
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromQuery] string statusName)
         {
             var order = await _context.Orders
                 .Include(o => o.StatusOrder)
@@ -148,18 +151,18 @@ namespace Project_PRN232_MVC.Controllers
             if (order == null)
                 return NotFound($"Order with ID {orderId} not found");
 
-            var newStatus = await _context.StatusOrders.FindAsync(statusOrderId);
-            if (newStatus == null)
-                return BadRequest($"Invalid statusOrderId: {statusOrderId}");
+            int? statusId = _configDataService.GetStatusOrderIdByStatusOrderName(statusName);
+            if (statusId == null)
+                return BadRequest($"Invalid status name: {statusName}");
 
-            order.StatusOrderId = statusOrderId;
+            order.StatusOrderId = statusId.Value;
             await _context.SaveChangesAsync();
 
             return Ok(new
             {
                 message = "Order status updated successfully",
                 orderId = order.OrderId,
-                newStatus = newStatus.StatusOrderName
+                newStatus = statusName
             });
         }
 
