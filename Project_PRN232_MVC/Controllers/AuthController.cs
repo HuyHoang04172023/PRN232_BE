@@ -30,6 +30,7 @@ namespace Project_PRN232_MVC.Controllers
             {
                 var account = _context.Users
                     .Include(u => u.Role)
+                    .Include(u => u.ShopCreatedByNavigations)
                     .FirstOrDefault(u => u.Email == loginDTO.Email && u.Password == loginDTO.Password);
 
                 if (account == null)
@@ -37,23 +38,20 @@ namespace Project_PRN232_MVC.Controllers
                     return Unauthorized("Invalid email or password.");
                 }
 
-                //IConfiguration configuration = new ConfigurationBuilder()
-                //    .SetBasePath(Directory.GetCurrentDirectory())
-                //    .AddJsonFile("appsettings.json", true, true)
-                //    .Build();
-
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, account.Email),
-                    new Claim("Role", account.Role.RoleName.ToString()),
-                    new Claim("AccountId", account.UserId.ToString())
-                };
+        {
+            new Claim(ClaimTypes.Email, account.Email),
+            new Claim("Role", account.Role.RoleName.ToString()),
+            new Claim("AccountId", account.UserId.ToString())
+        };
+
                 var secret = _configuration["JWT:SecretKey"];
                 if (secret == null)
                 {
                     return BadRequest("JWT:SecretKey not found in configuration.");
                 }
-                var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
+
+                var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
                 var signCredential = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
 
                 var preparedToken = new JwtSecurityToken(
@@ -65,14 +63,19 @@ namespace Project_PRN232_MVC.Controllers
                 );
 
                 var generatedToken = new JwtSecurityTokenHandler().WriteToken(preparedToken);
-                var role = account.Role.RoleName.ToString();
-                var accountId = account.UserId.ToString();
 
-                return Ok(new AccountResponseDTO
+                int? shopId = null;
+                if (account.Role.RoleName.ToLower() == "sale")
                 {
-                    Role = role,
+                    shopId = account.ShopCreatedByNavigations.FirstOrDefault()?.ShopId;
+                }
+
+                return Ok(new
+                {
+                    Role = account.Role.RoleName,
                     Token = generatedToken,
-                    AccountId = accountId
+                    AccountId = account.UserId,
+                    ShopId = shopId
                 });
             }
             catch (Exception e)
