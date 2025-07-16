@@ -351,6 +351,134 @@ namespace Project_PRN232_MVC.Controllers
             return Ok(result);
         }
 
-        
+        // cac api thong ke ve user
+        [HttpGet("user/users-by-role")]
+        public IActionResult GetUsersByRole()
+        {
+            var result = _context.Users
+                .Include(u => u.Role)
+                .GroupBy(u => u.Role.RoleName)
+                .Select(g => new {
+                    Role = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("user/new-users-per-month")]
+        public IActionResult GetNewUsersPerMonth()
+        {
+            var result = _context.Users
+                .Where(u => u.CreatedAt != null)
+                .GroupBy(u => new { u.CreatedAt!.Value.Year, u.CreatedAt!.Value.Month })
+                .Select(g => new {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Count = g.Count()
+                })
+                .ToList()
+                .Select(x => new {
+                    Month = $"{x.Year}-{x.Month:00}",
+                    x.Count
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("user/top-users-by-orders")]
+        public IActionResult GetTopUsersByOrders()
+        {
+            var result = _context.Orders
+                .Include(o => o.User)
+                .ToList()
+                .GroupBy(o => new {
+                    o.User.UserId,
+                    o.User.UserName
+                })
+                .Select(g => new {
+                    UserId = g.Key.UserId,
+                    UserName = g.Key.UserName,
+                    TotalOrders = g.Count()
+                })
+                .OrderByDescending(x => x.TotalOrders)
+                .Take(10)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("user/top-users-by-reviews")]
+        public IActionResult GetTopUsersByReviews()
+        {
+            var result = _context.Reviews
+                .Include(r => r.User)
+                .ToList()
+                .GroupBy(r => new {
+                    r.User.UserId,
+                    r.User.UserName
+                })
+                .Select(g => new {
+                    UserId = g.Key.UserId,
+                    UserName = g.Key.UserName,
+                    ReviewCount = g.Count()
+                })
+                .OrderByDescending(x => x.ReviewCount)
+                .Take(10)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("user/top-users-by-likes")]
+        public IActionResult GetTopUsersByLikes()
+        {
+            var result = _context.Likes
+                .Include(l => l.User)
+                .ToList()
+                .GroupBy(l => new {
+                    l.User.UserId,
+                    l.User.UserName
+                })
+                .Select(g => new {
+                    UserId = g.Key.UserId,
+                    UserName = g.Key.UserName,
+                    LikeCount = g.Count()
+                })
+                .OrderByDescending(x => x.LikeCount)
+                .Take(10)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("user/shops-by-user")]
+        public IActionResult GetShopsCreatedByUser()
+        {
+            var result = _context.Shops
+                .Where(s => s.CreatedBy != null)
+                .ToList()
+                .GroupBy(s => s.CreatedBy)
+                .Select(g => new {
+                    UserId = g.Key,
+                    ShopCount = g.Count()
+                })
+                .Join(_context.Users,
+                    g => g.UserId,
+                    u => u.UserId,
+                    (g, u) => new {
+                        u.UserId,
+                        u.UserName,
+                        g.ShopCount
+                    })
+                .OrderByDescending(x => x.ShopCount)
+                .Take(10)
+                .ToList();
+
+            return Ok(result);
+        }
     }
 }
