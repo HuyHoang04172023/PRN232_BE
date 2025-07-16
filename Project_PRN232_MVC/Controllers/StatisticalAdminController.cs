@@ -242,6 +242,115 @@ namespace Project_PRN232_MVC.Controllers
             return Ok(result);
         }
 
+        //cac api thong ke ve shop
+        [HttpGet("shop/shops-by-status")]
+        public IActionResult GetShopsByStatus()
+        {
+            var result = _context.Shops
+                .Include(s => s.StatusShop)
+                .GroupBy(s => s.StatusShop.StatusShopName)
+                .Select(g => new {
+                    Status = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("shop/revenue-by-shop-variant")]
+        public IActionResult GetRevenueByShop2()
+        {
+            var result = _context.OrderItems
+                .Include(oi => oi.Order)
+                .ThenInclude(o => o.Shop)
+                .ToList()
+                .GroupBy(oi => oi.Order.Shop.ShopName)
+                .Select(g => new {
+                    ShopName = g.Key,
+                    Revenue = g.Sum(x => x.OrderItemPrice * x.OrderItemQuantity)
+                })
+                .OrderByDescending(x => x.Revenue)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("shop/orders-by-shop")]
+        public IActionResult GetOrdersByShop2()
+        {
+            var result = _context.Orders
+                .Include(o => o.Shop)
+                .ToList()
+                .GroupBy(o => o.Shop.ShopName)
+                .Select(g => new {
+                    ShopName = g.Key,
+                    TotalOrders = g.Count()
+                })
+                .OrderByDescending(x => x.TotalOrders)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("shop/products-by-shop")]
+        public IActionResult GetProductsByShop()
+        {
+            var result = _context.Products
+                .Include(p => p.Shop)
+                .ToList()
+                .GroupBy(p => p.Shop.ShopName)
+                .Select(g => new {
+                    ShopName = g.Key,
+                    ProductCount = g.Count()
+                })
+                .OrderByDescending(x => x.ProductCount)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("shop/new-shops-per-month")]
+        public IActionResult GetNewShopsPerMonth()
+        {
+            var result = _context.Shops
+                .Where(s => s.CreatedAt != null)
+                .GroupBy(s => new { s.CreatedAt!.Value.Year, s.CreatedAt!.Value.Month })
+                .Select(g => new {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Count = g.Count()
+                })
+                .ToList()
+                .Select(x => new {
+                    Month = $"{x.Year}-{x.Month:00}",
+                    x.Count
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("shop/top-rated-shops")]
+        public IActionResult GetTopRatedShops()
+        {
+            var result = _context.ShopReviews
+                .Include(sr => sr.Shop)
+                .ToList()
+                .GroupBy(sr => sr.Shop.ShopName)
+                .Select(g => new {
+                    ShopName = g.Key,
+                    ReviewCount = g.Count(),
+                    AverageRating = Math.Round(g.Average(x => x.ShopReviewRating), 2)
+                })
+                .OrderByDescending(x => x.AverageRating)
+                .Take(10)
+                .ToList();
+
+            return Ok(result);
+        }
+
         
     }
 }
