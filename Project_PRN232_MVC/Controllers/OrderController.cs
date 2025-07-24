@@ -38,6 +38,8 @@ namespace Project_PRN232_MVC.Controllers
                 StatusOrderId = 1
             };
 
+            var variantIdsInOrder = new List<int>();
+
             foreach (var item in request.Items)
             {
                 var variant = await _context.ProductVariants.FindAsync(item.ProductVariantId);
@@ -52,9 +54,24 @@ namespace Project_PRN232_MVC.Controllers
                 };
 
                 order.OrderItems.Add(orderItem);
+                variantIdsInOrder.Add(variant.ProductVariantId);
             }
 
             _context.Orders.Add(order);
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == request.UserId);
+
+            if (cart != null)
+            {
+                var itemsToRemove = cart.CartItems
+                    .Where(ci => variantIdsInOrder.Contains(ci.ProductVariantId))
+                    .ToList();
+
+                _context.CartItems.RemoveRange(itemsToRemove);
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Order created successfully", orderId = order.OrderId });
@@ -111,6 +128,7 @@ namespace Project_PRN232_MVC.Controllers
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.ProductVariant)
                         .ThenInclude(pv => pv.Product)
+                .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
             if (!orders.Any())
