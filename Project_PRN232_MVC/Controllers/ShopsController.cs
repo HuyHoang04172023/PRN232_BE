@@ -82,6 +82,33 @@ namespace Project_PRN232_MVC.Controllers
             return Ok(response);
         }
 
+        [HttpGet("shop-info/{shopId}")]
+        public IActionResult GetShopDetail(int shopId)
+        {
+            var shop = _context.Shops
+                .Include(s => s.StatusShop)
+                .Include(s => s.CreatedByNavigation)
+                .FirstOrDefault(s => s.ShopId == shopId);
+
+            if (shop == null)
+            {
+                return NotFound(new { message = "Không tìm thấy cửa hàng." });
+            }
+
+            var response = new ShopDetailResponse
+            {
+                ShopId = shop.ShopId,
+                ShopName = shop.ShopName,
+                ShopAddress = shop.ShopAddress,
+                ShopImage = shop.ShopImage,
+                ShopDescription = shop.ShopDescription,
+                CreatedAt = shop.CreatedAt,
+                StatusShopName = shop.StatusShop?.StatusShopName,
+            };
+
+            return Ok(response);
+        }
+
         // POST: api/Shops
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Policy = "UserOnly")]
