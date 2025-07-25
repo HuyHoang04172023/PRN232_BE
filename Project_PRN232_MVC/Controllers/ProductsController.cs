@@ -197,7 +197,6 @@ namespace Project_PRN232_MVC.Controllers
                 return BadRequest(new { message = "Cần ít nhất một biến thể sản phẩm." });
             }
 
-            // ✅ Validate không trùng size
             var duplicateSizeIds = request.ProductVariants
                 .GroupBy(v => v.ProductSizeId)
                 .Where(g => g.Count() > 1)
@@ -215,7 +214,9 @@ namespace Project_PRN232_MVC.Controllers
 
             try
             {
-                var product = _productService.GetProductByProductId(productId);
+                var product = _context.Products
+                    .Include(p => p.ProductVariants)
+                    .FirstOrDefault(p => p.ProductId == productId);
 
                 if (product == null)
                 {
@@ -261,7 +262,7 @@ namespace Project_PRN232_MVC.Controllers
                     }
                 }
 
-                _context.SaveChanges();
+                _context.SaveChangesAsync();
 
                 return Ok(new { message = "Cập nhật sản phẩm thành công." });
             }
