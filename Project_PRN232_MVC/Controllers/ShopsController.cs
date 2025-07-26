@@ -246,5 +246,23 @@ namespace Project_PRN232_MVC.Controllers
                 return NotFound(new { message = "Không tìm thấy cửa hàng hoặc lỗi khi cập nhật." });
             }
         }
+
+        [HttpGet("shop-id/{productId}")]
+        public IActionResult GetShopIdByProductId(int productId)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.ProductId == productId);
+
+            if (product == null)
+            {
+                return NotFound(new { message = "Không tìm thấy sản phẩm." });
+            }
+
+            return Ok(new
+            {
+                productId = product.ProductId,
+                shopId = product.ShopId
+            });
+        }
+
     }
 }

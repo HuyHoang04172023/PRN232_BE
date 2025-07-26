@@ -160,6 +160,7 @@ namespace Project_PRN232_MVC.Controllers
                     StatusProductId = (int)_configDataService.GetStatusProductIdByStatusProductName("pending"),
                     ShopId = shopId.Value,
                     CreatedBy = request.CreatedBy,
+                    ApprovedBy = 20,
                     CreatedAt = DateTime.UtcNow,
                 };
 
@@ -365,5 +366,50 @@ namespace Project_PRN232_MVC.Controllers
                 return NotFound(new { message = "Không tìm thấy cửa hàng hoặc lỗi khi cập nhật." });
             }
         }
+
+        [HttpGet("status/{statusName}/shop/{shopId}")]
+        public IActionResult GetProductsByStatusAndShop(string statusName, int shopId)
+        {
+            try
+            {
+                bool statusExists = _configDataService.CheckStatusProductExist(statusName);
+                if (!statusExists)
+                {
+                    return NotFound(new { message = "Không tìm thấy trạng thái sản phẩm." });
+                }
+
+                var products = _productService
+                    .GetProductsByStatusName(statusName)
+                    .Where(p => p.ShopId == shopId)
+                    .ToList();
+
+                var response = products.Select(product => new ProductResponse
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    ProductDescription = product.ProductDescription,
+                    ProductImage = product.ProductImage,
+                    StatusProductId = product.StatusProductId,
+                    StatusProductName = product.StatusProduct?.StatusProductName,
+                    ProductSoldCount = product.ProductSoldCount,
+                    ProductLike = product.ProductLike,
+                    ShopId = product.ShopId,
+                    ShopName = product.Shop?.ShopName,
+                    ProductVariants = product.ProductVariants.Select(v => new ProductVariantResponse
+                    {
+                        ProductVariantId = v.ProductVariantId,
+                        ProductVariantPrice = v.ProductVariantPrice,
+                        ProductSizeId = v.ProductSizeId
+                    }).ToList()
+                }).ToList();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách sản phẩm", error = ex.Message });
+            }
+        }
+
     }
 }
